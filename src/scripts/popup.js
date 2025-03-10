@@ -1,0 +1,27 @@
+import { getTasksCsv } from "./automations.js"
+
+const automations = {
+    'tasks-csv': getTasksCsv
+}
+
+const startButtons = document.querySelectorAll('button')
+
+startButtons.forEach(startButton => startButton.addEventListener('click', async () => {
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+    const buttonId = startButton.getAttribute('id')
+
+    const automationFunction = automations[buttonId]
+
+    if (automationFunction) {
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: automationFunction,
+        })
+    } else {
+        console.error('Automação não encontrada.');
+    }
+
+}))
+
+

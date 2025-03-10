@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "Una Automations",
+    "version": "0.0.1",
+    "description": "Extensão que contém as automações para a plataforma UNA - CAPE Digital.",
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "./src/assets/icon.png"
+    },
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": [
+        "https://plataforma.dataprev.gov.br/#/capedigital/*"
+    ]
+}
