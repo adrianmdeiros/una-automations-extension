@@ -6,10 +6,10 @@ const automations = {
 
 const startButtons = document.querySelectorAll('button')
 
-startButtons.forEach(startButton => startButton.addEventListener('click', async () => {
+startButtons.forEach(button => button.addEventListener('click', async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
 
-    const buttonId = startButton.getAttribute('id')
+    const buttonId = button.getAttribute('id')
 
     const automationFunction = automations[buttonId]
 
@@ -28,4 +28,3 @@ startButtons.forEach(startButton => startButton.addEventListener('click', async 
 const fullYear = new Date().getFullYear()
 const footerYearSpan = document.getElementById('actual-year') 
 footerYearSpan.innerHTML = fullYear
-

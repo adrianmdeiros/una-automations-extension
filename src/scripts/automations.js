@@ -4,5 +4,4 @@ export async function getTasksCsv() {
         const exportTasksButton = document.getElementById('buttonExportarTarefas')
         exportTasksButton.click()
     }, 3000)
-
 }
