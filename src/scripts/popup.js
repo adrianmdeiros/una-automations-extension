@@ -4,22 +4,29 @@ const automations = {
     'tasks-csv': getTasksCsv
 }
 
+const allowedHosts = ['plataforma.dataprev.gov.br']
+
 const startButtons = document.querySelectorAll('button')
 
 startButtons.forEach(button => button.addEventListener('click', async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    
+    const url = new URL(tab.url)
+    if (!allowedHosts.includes(url.hostname)) {
+        alert("Este script só pode ser executado em sites autorizados.")
+        return
+    }
 
     const buttonId = button.getAttribute('id')
-
     const automationFunction = automations[buttonId]
-
+    
     if (automationFunction) {
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: automationFunction,
         })
     } else {
-        console.error('Automação não encontrada.');
+        alert('Automação não encontrada.')
     }
 
 }))
