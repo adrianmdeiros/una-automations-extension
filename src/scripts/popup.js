@@ -13,7 +13,12 @@ startButtons.forEach(button => button.addEventListener('click', async () => {
     
     const url = new URL(tab.url)
     if (!allowedHosts.includes(url.hostname)) {
-        alert("Este script só pode ser executado em sites autorizados.")
+        alert("⚠ Você só pode utilizar as automações na plataforma UNA - CAPE DIGITAL.")
+        return
+    }
+    
+    if(tab.url.includes('/login')){
+        alert("⚠ Você precisa estar autenticado na UNA - CAPE DIGITAL para utilizar as automações.")
         return
     }
 
@@ -21,10 +26,12 @@ startButtons.forEach(button => button.addEventListener('click', async () => {
     const automationFunction = automations[buttonId]
     
     if (automationFunction) {
+        button.disabled = true
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: automationFunction,
         })
+        button.disabled = false
     } else {
         alert('Automação não encontrada.')
     }
