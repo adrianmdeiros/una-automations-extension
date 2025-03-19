@@ -1,14 +1,19 @@
 import { getTasksCsv } from "./automations.js"
 
-const automations = {
-    'tasks-csv': getTasksCsv
-}
-
 const allowedHosts = ['plataforma.dataprev.gov.br']
+
+const automations = [
+    {
+        name: '🤖 Baixar planilha de tarefas',
+        action: getTasksCsv
+    }
+]
+
+createAutomationButtons(automations)
 
 const startButtons = document.querySelectorAll('button')
 
-startButtons.forEach(button => button.addEventListener('click', async () => {
+startButtons.forEach((button, key) => button.addEventListener('click', async () => {
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
     
     const url = new URL(tab.url)
@@ -22,8 +27,7 @@ startButtons.forEach(button => button.addEventListener('click', async () => {
         return
     }
 
-    const buttonId = button.getAttribute('id')
-    const automationFunction = automations[buttonId]
+    const automationFunction = automations[key].action
     
     if (automationFunction) {
         button.disabled = true
@@ -38,7 +42,15 @@ startButtons.forEach(button => button.addEventListener('click', async () => {
 
 }))
 
+function createAutomationButtons(automations){
+    const buttonsList = document.getElementById('buttons-list')
 
-const fullYear = new Date().getFullYear()
-const footerYearSpan = document.getElementById('actual-year') 
-footerYearSpan.innerHTML = fullYear
+    automations.forEach(({ name }) => {
+        const buttonItem = document.createElement('li')
+        const button = document.createElement('button')
+        button.innerText = name
+        buttonItem.appendChild(button)
+        buttonsList.appendChild(buttonItem)
+    })
+
+}
