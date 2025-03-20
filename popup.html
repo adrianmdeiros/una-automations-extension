@@ -22,16 +22,26 @@
         </p>
     </header>
     <main>
-        <ul id="buttons-list">
-        </ul>
+        <div>
+            <label htmlFor="profiles-select">Selecione um perfil:</label>
+            <select id="profiles-select">
+                <option>Selecione</option>
+            </select>
+        </div>
+        <div>
+            <ul id="buttons-list">
+            </ul>
+        </div>
     </main>
     <footer>
         <span id="actual-year"></span>
     </footer>
 </body>
 
-<script type="module" src="./src/scripts/popup.js"></script>
 <script type="module" src="./src/scripts/automations.js"></script>
+<script type="module" src="./src/scripts/profiles.js"></script>
+<script type="module" src="./src/scripts/actions.js"></script>
+<script type="module" src="./src/scripts/popup.js"></script>
 <script type="module" src="./src/scripts/year-footer.js"></script>
 
 </html>
