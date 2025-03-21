@@ -1,7 +1,7 @@
 # 🤖 Extensão Una Automations
 Extensão do google chrome para automações(scraping) do sistema UNA - CAPE Digital.
 
-![Extensão aberta](.github/image.png)
+![Extensão da CAPE Digital](.github/image.png)
 
 ## 🚀 Tecnologias 
 - HTML
