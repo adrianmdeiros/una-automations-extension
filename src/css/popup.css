@@ -42,14 +42,18 @@ main {
   margin-top: 4rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 4rem;
 }
 
-/* label{
-    font-size: 1.4rem;
-    color: #f5f5f5;
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.4rem;
+  margin-bottom: .2rem;
 }
 
+/*
 select{
     border: none;
     width: 100%;
@@ -68,6 +72,7 @@ ul {
 }
 
 button {
+  text-align: start;
   width: 100%;
   padding: 1.2rem 1.8rem;
   border-radius: 99rem;
@@ -78,7 +83,7 @@ button {
 }
 
 button:hover {
-  background-color: #ffffff;
+  background-color: white;
 }
 
 button:disabled {
@@ -88,6 +93,38 @@ button:disabled {
 
 button:disabled:hover {
   background-color: #808080;
+}
+
+.merge-sheets {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.4rem;
+}
+
+label[for="sheets"]{
+  color: #808080;
+  font-weight: bold;
+}
+
+input[type="file"] {
+  color: #808080;
+}
+
+button#merge-sheet-files {
+  margin-top: 1rem;
+  background-color: #a3c96b;
+  border-radius: 99rem;
+  padding: 1rem 1.6rem;
+  text-align: center;
+}
+
+button#merge-sheet-files:hover{
+  background-color: #abd370;
+}
+
+button#merge-sheet-files:disabled{
+  opacity: 60%;
 }
 
 footer {
@@ -101,8 +138,7 @@ span {
   color: #808080;
 }
 
-
-.loading{
+.loading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -111,23 +147,25 @@ span {
   width: 100%;
 }
 
-.hidden{
+.hidden {
   display: none;
 }
 
 .loader {
   width: 4rem;
-  padding: .6rem;
+  padding: 0.6rem;
   aspect-ratio: 1;
   border-radius: 50%;
   background: linear-gradient(90deg, #fbcb82, #6ba7d6, #a3c96b);
-  --_m: 
-    conic-gradient(#0000 10%,#000),
-    linear-gradient(#000 0 0) content-box;
+  --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
   -webkit-mask: var(--_m);
-          mask: var(--_m);
+  mask: var(--_m);
   -webkit-mask-composite: source-out;
-          mask-composite: subtract;
+  mask-composite: subtract;
   animation: l3 1s infinite linear;
 }
-@keyframes l3 {to{transform: rotate(1turn)}}
+@keyframes l3 {
+  to {
+    transform: rotate(1turn);
+  }
+}

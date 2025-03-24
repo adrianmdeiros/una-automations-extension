@@ -23,7 +23,7 @@
     </header>
     <main>
         <!-- <div>
-            <label htmlFor="profiles-select">Selecione um perfil:</label>
+            <label for="profiles-select">Selecione um perfil:</label>
             <select id="profiles-select">
                 <option value="">Selecione</option>
             </select>
@@ -36,6 +36,13 @@
             <div class="loader"></div>
             <p>Aguarde...</p>
         </div>
+        <div class="merge-sheets">
+            <label for="sheets">
+                Mesclar planilhas
+            </label>
+            <input id="sheets" type="file" name="sheets" multiple accept=".csv"/>
+            <button id="merge-sheet-files" disabled>⚡ Mesclar</button>
+        </div>
     </main>
     <footer>
         <span id="actual-year"></span>
@@ -47,5 +54,6 @@
 <script type="module" src="./src/scripts/actions.js"></script>
 <script type="module" src="./src/scripts/popup.js"></script>
 <script type="module" src="./src/scripts/year-footer.js"></script>
+<script type="module" src="./src/scripts/merge-sheets.js"></script>
 
 </html>
