@@ -62,6 +62,23 @@ export async function getFaceToFaceServices(_selectedProfile) {
             const servicesReportTab = await waitFor('[aria-label="Relação de Atendimentos"]')
             servicesReportTab[0].click()
 
+            const selectPeriod = await waitFor('#select-selectPeriodoRelacao_ button')
+            selectPeriod[0].click()
+            
+            await delay(3000)
+            const periods = await waitFor('#select-selectPeriodoRelacao_-popup [role="option"]')
+
+            for (const period of periods) {
+                if (period.textContent.trim() === 'Mês passado') {
+                    period.click()
+                    break
+                }
+            }
+
+            const searchButton = await waitFor('#buttonPesquisarMonitoramentoRelacaoAtendimento')
+            searchButton[0].click()
+
+            // await delay(5000)
             const exportButton = await waitFor('#buttonExportarMonitoramentoUnidadeCSV', 5000);
             exportButton[0].click();
         }
