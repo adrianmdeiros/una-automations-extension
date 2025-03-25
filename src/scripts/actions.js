@@ -56,11 +56,13 @@ export async function getFaceToFaceServices(_selectedProfile) {
             const confirmButton = await waitFor('#BtnConfirmarExclusaoOrgao');
             confirmButton[0].click();
 
-
             await delay(3000);
-            window.location.href = 'https://plataforma.dataprev.gov.br/#/capedigital/atendimento';
+            window.location.href = 'https://plataforma.dataprev.gov.br/#/capedigital/monitoramento-unidade';
 
-            const exportButton = await waitFor('#buttonExportarAtendimentosProfissionalCSV', 5000);
+            const servicesReportTab = await waitFor('[aria-label="Relação de Atendimentos"]')
+            servicesReportTab[0].click()
+
+            const exportButton = await waitFor('#buttonExportarMonitoramentoUnidadeCSV', 5000);
             exportButton[0].click();
         }
     } catch (error) {
@@ -157,7 +159,10 @@ export async function getBackOfficeTasks(){
             await delay(3000);
             window.location.href = 'https://plataforma.dataprev.gov.br/#/capedigital/painel-tarefas';
 
-            const exportButton = await waitFor('#buttonExportarTarefas', 5000);
+            const allTasksTab = await waitFor('[aria-label="Todas as Tarefas"]')
+            allTasksTab[0].click()
+
+            const exportButton = await waitFor('#buttonExportarTodasTarefas', 5000);
             exportButton[0].click();
         }
     } catch (error) {

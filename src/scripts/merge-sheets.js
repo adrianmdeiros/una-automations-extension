@@ -21,9 +21,9 @@ document.getElementById('merge-sheet-files').addEventListener('click', () => {
   const mergeButton = document.getElementById('merge-sheet-files');
 
   if(files.length === 0){
-    document.getElementById('merge-sheet-files').disabled = true
-    alert('Anexe pelo menos 2 arquivos.')
-    return
+    mergeButton.disabled = true;
+    alert('Anexe pelo menos 2 arquivos.');
+    return;
   }
 
   let allRows = [];
@@ -44,6 +44,7 @@ document.getElementById('merge-sheet-files').addEventListener('click', () => {
       contents.forEach(csv => {
         const lines = csv.split(/\r?\n/).filter(l => l.trim() !== '');
         if (lines.length === 0) return;
+        // Altere aqui para separar pelo delimitador correto, se necessário
         const headers = lines[0].split(',');
         headers.forEach(header => uniqueHeaders.add(header));
       });
@@ -65,12 +66,13 @@ document.getElementById('merge-sheet-files').addEventListener('click', () => {
           });
           // Alinha valores com os headers consolidados
           const mergedRow = mergedHeaders.map(header => rowMap[header] || '');
-          allRows.push(mergedRow.join(','));
+          // Use ponto e vírgula como separador para que o Excel reconheça os campos
+          allRows.push(mergedRow.join(';'));
         });
       });
 
       // Adiciona BOM e cabeçalho consolidado
-      const mergedCsv = '\uFEFF' + mergedHeaders.join(',') + '\n' + allRows.join('\n');
+      const mergedCsv = '\uFEFF' + mergedHeaders.join(';') + '\n' + allRows.join('\n');
 
       // Cria o Blob com UTF-8
       const blob = new Blob([mergedCsv], { type: 'text/csv;charset=UTF-8' });
@@ -90,6 +92,4 @@ document.getElementById('merge-sheet-files').addEventListener('click', () => {
       console.error('Erro:', error);
       alert('Erro ao processar arquivos!');
     });
-
-
 });
