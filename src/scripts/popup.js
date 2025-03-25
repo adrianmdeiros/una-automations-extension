@@ -5,6 +5,7 @@ const allowedHosts = ['plataforma.dataprev.gov.br']
 const automationButtons = document.querySelectorAll('#buttons-list li button')
 const loadingElement = document.querySelector('.loading')
 const mergeSheetsSection = document.querySelector('.merge-sheets')
+const automationsSection = document.querySelector('.automations')
 
 automationButtons.forEach((button, key) => button.addEventListener('click', async () => {
     // const selectedProfile = document.getElementById('profiles-select').value
@@ -29,22 +30,22 @@ automationButtons.forEach((button, key) => button.addEventListener('click', asyn
     const automationFunction = automations[key].action
 
     if (automationFunction) {
-        automationButtons.forEach(button => button.disabled = true)
         loadingElement.classList.remove('hidden')
         mergeSheetsSection.classList.add('hidden')
+        automationsSection.classList.add('hidden')
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: automationFunction,
             // args: [selectedProfile]
         })
-        automationButtons.forEach(button => button.disabled = false)
         loadingElement.classList.add('hidden')
         mergeSheetsSection.classList.remove('hidden')
+        automationsSection.classList.remove('hidden')
     } else {
         alert('Automação não encontrada.')
-        automationButtons.forEach(button => button.disabled = false)
         loadingElement.classList.add('hidden')
         mergeSheetsSection.classList.remove('hidden')
+        automationsSection.classList.remove('hidden')
     }
 
 }))

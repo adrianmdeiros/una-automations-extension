@@ -27,7 +27,7 @@ header {
 }
 
 h2 {
-  background: linear-gradient(90deg, #fbcb82, #6ba7d6, #a3c96b);
+  background: linear-gradient(90deg, #6ba7d6 0%, #a3c96b 33%, #fbcb82 66%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;
@@ -36,10 +36,11 @@ h2 {
 p {
   font-size: 1.4rem;
   color: #909090;
+  text-align: start;
 }
 
 main {
-  margin-top: 4rem;
+  margin-top: 2.8rem;
   display: flex;
   flex-direction: column;
   gap: 4rem;
@@ -51,6 +52,9 @@ label {
   gap: 0.4rem;
   font-size: 1.4rem;
   margin-bottom: .2rem;
+  color: #909090;
+  font-weight: bold;
+  margin-bottom: .6rem;
 }
 
 /*
@@ -99,12 +103,6 @@ button:disabled:hover {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 0.4rem;
-}
-
-label[for="sheets"]{
-  color: #808080;
-  font-weight: bold;
 }
 
 input[type="file"] {
@@ -121,6 +119,7 @@ button#merge-sheet-files {
 
 button#merge-sheet-files:hover{
   background-color: #abd370;
+  transition: all;
 }
 
 button#merge-sheet-files:disabled{
@@ -156,7 +155,7 @@ span {
   padding: 0.6rem;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: linear-gradient(90deg, #fbcb82, #6ba7d6, #a3c96b);
+  background: linear-gradient(90deg, #6ba7d6 0%, #a3c96b 33%, #fbcb82 66%);
   --_m: conic-gradient(#0000 10%, #000), linear-gradient(#000 0 0) content-box;
   -webkit-mask: var(--_m);
   mask: var(--_m);

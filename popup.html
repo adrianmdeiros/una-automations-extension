@@ -28,19 +28,20 @@
                 <option value="">Selecione</option>
             </select>
         </div> -->
-        <div>
+        <div class="automations">
+            <label for="automations">Automações</label>
             <ul id="buttons-list">
             </ul>
         </div>
         <div class="loading hidden">
             <div class="loader"></div>
-            <p>Aguarde...</p>
+            <p>Por favor, aguarde...</p>
         </div>
         <div class="merge-sheets">
             <label for="sheets">
                 Mesclar planilhas
             </label>
-            <input id="sheets" type="file" name="sheets" multiple accept=".csv"/>
+            <input id="sheets" type="file" name="sheets" multiple accept=".csv" />
             <button id="merge-sheet-files" disabled>⚡ Mesclar</button>
         </div>
     </main>

@@ -2,6 +2,11 @@ document.getElementById('sheets').addEventListener('change', () => {
   const fileInput = document.getElementById('sheets');
   const files = fileInput.files;
 
+  if(files.length === 0){
+    document.getElementById('merge-sheet-files').disabled = true
+    return
+  }
+
   if(files.length >= 2){
     document.getElementById('merge-sheet-files').disabled = false
     return
@@ -13,6 +18,13 @@ document.getElementById('sheets').addEventListener('change', () => {
 document.getElementById('merge-sheet-files').addEventListener('click', () => {
   const fileInput = document.getElementById('sheets');
   const files = fileInput.files;
+  const mergeButton = document.getElementById('merge-sheet-files');
+
+  if(files.length === 0){
+    document.getElementById('merge-sheet-files').disabled = true
+    alert('Anexe pelo menos 2 arquivos.')
+    return
+  }
 
   let allRows = [];
   const uniqueHeaders = new Set();
@@ -65,14 +77,19 @@ document.getElementById('merge-sheet-files').addEventListener('click', () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'merged.csv';
+      a.download = 'planilhas_mescladas.csv';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      fileInput.value = '';
+      mergeButton.disabled = true;
     })
     .catch(error => {
       console.error('Erro:', error);
       alert('Erro ao processar arquivos!');
     });
+
+
 });
