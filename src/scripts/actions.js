@@ -78,7 +78,7 @@ export async function getFaceToFaceServices(_selectedProfile) {
             const searchButton = await waitFor('#buttonPesquisarMonitoramentoRelacaoAtendimento')
             searchButton[0].click()
 
-            // await delay(5000)
+            await delay(3000)
             const exportButton = await waitFor('#buttonExportarMonitoramentoUnidadeCSV', 5000);
             exportButton[0].click();
         }
