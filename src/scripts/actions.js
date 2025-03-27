@@ -46,6 +46,11 @@ export async function getFaceToFaceServices(_selectedProfile) {
             await delay(3000)
             const profiles = await waitFor('#select-selectPerfil-popup [role="option"]');
 
+            if(!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))){
+                alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
+                return
+            }
+
             for (const profile of profiles) {
                 if (profile.textContent.trim() === 'GESTOR_UNIDADE') {
                     profile.click()
@@ -161,6 +166,11 @@ export async function getBackOfficeTasks(){
 
             await delay(3000)
             const profiles = await waitFor('#select-selectPerfil-popup [role="option"]');
+            
+            if(!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))){
+                alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
+                return
+            }
 
             for (const profile of profiles) {
                 if (profile.textContent.trim() === 'GESTOR_UNIDADE') {
