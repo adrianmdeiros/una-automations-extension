@@ -38,13 +38,20 @@ export async function getFaceToFaceServices(_selectedProfile) {
 
             await delay(3000)
             const units = await waitFor('#select-selectUnidades-popup [role="option"]');
-            units[i + 1].click()
+            // const unitNameEstate = units[i+1].textContent.substring(0, 7).trim()
+
+            units[i+1].click()
 
             const selectProfile = await waitFor('#select-selectPerfil button');
             selectProfile[0].click();
 
             await delay(3000)
             const profiles = await waitFor('#select-selectPerfil-popup [role="option"]');
+
+            if(!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))){
+                alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
+                return
+            }
 
             for (const profile of profiles) {
                 if (profile.textContent.trim() === 'GESTOR_UNIDADE') {
@@ -77,6 +84,17 @@ export async function getFaceToFaceServices(_selectedProfile) {
 
             const searchButton = await waitFor('#buttonPesquisarMonitoramentoRelacaoAtendimento')
             searchButton[0].click()
+
+            // const table = document.querySelector('[name="tableRelacaoAtendimentos"] table')
+            // console.log(table);
+            
+            // const tableHead = table.querySelector('thead tr')
+            // const unitTableHead = `<th colspan="1" role="columnheader" scope="col">Unidade</th>`
+            // tableHead.appendChild(unitTableHead)
+
+            // const tableRows = table.querySelectorAll('tbody tr')
+
+
 
             await delay(3000)
             const exportButton = await waitFor('#buttonExportarMonitoramentoUnidadeCSV', 5000);
@@ -114,7 +132,7 @@ export async function getFaceToFaceServices(_selectedProfile) {
     }
 }
 
-export async function getBackOfficeTasks(){
+export async function getBackOfficeTasks(_selectedProfile){
     try {
         const menu = await waitFor('[aria-controls="menu-appbar"]');
         menu[0].click();
@@ -161,6 +179,11 @@ export async function getBackOfficeTasks(){
 
             await delay(3000)
             const profiles = await waitFor('#select-selectPerfil-popup [role="option"]');
+            
+            if(!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))){
+                alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
+                return
+            }
 
             for (const profile of profiles) {
                 if (profile.textContent.trim() === 'GESTOR_UNIDADE') {
