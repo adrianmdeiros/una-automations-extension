@@ -15,12 +15,12 @@ export async function getFaceToFaceServices(_selectedProfile) {
         selectUnit[0].click();
 
         await delay(3000)
-        const units = await waitFor('#select-selectUnidades-popup [role="option"]');
+        const selectUnits = await waitFor('#select-selectUnidades-popup [role="option"]');
 
         const closeSelectUnitButton = await waitFor('[aria-label="Close"]')
         closeSelectUnitButton[0].click()
 
-        for (let i = 0; i < units.length - 1; i++) {
+        for (let i = 1; i < selectUnits.length; i++) {
             await delay(3000)
             const menu = await waitFor('[aria-controls="menu-appbar"]');
             menu[0].click();
@@ -38,9 +38,19 @@ export async function getFaceToFaceServices(_selectedProfile) {
 
             await delay(3000)
             const units = await waitFor('#select-selectUnidades-popup [role="option"]');
-            const unitNameEstate = units[i + 1].textContent.substring(0, 7).trim()
 
-            units[i + 1].click()
+            while (i < units.length && units[i].textContent.includes('Equipe')) {
+                i++
+            }
+
+            if (i >= units.length) break
+
+            const unitTextContent = units[i].textContent
+            const unitNameState = unitTextContent.includes('GO/TO')
+                ? unitTextContent.substring(0, 10).trim()
+                : unitTextContent.substring(0, 7).trim()
+
+            units[i].click()
 
             const selectProfile = await waitFor('#select-selectPerfil button');
             selectProfile[0].click();
@@ -85,12 +95,12 @@ export async function getFaceToFaceServices(_selectedProfile) {
             const searchButton = await waitFor('#buttonPesquisarMonitoramentoRelacaoAtendimento')
             searchButton[0].click()
 
-            // await delay(5000)
-            // tableToCSV(unitNameEstate);
+            await delay(5000)
+            await tableToCSV(unitNameState);
 
-            await delay(3000)
-            const exportButton = await waitFor('#buttonExportarMonitoramentoUnidadeCSV', 5000);
-            exportButton[0].click()
+            // await delay(3000)
+            // const exportButton = await waitFor('#buttonExportarMonitoramentoUnidadeCSV', 5000);
+            // exportButton[0].click()
 
         }
     } catch (error) {
@@ -127,37 +137,71 @@ export async function getFaceToFaceServices(_selectedProfile) {
     // ToDo - arrumar headers que ele nao está separando
     async function tableToCSV(unidade) {
         let table = await waitFor('[name="tableRelacaoAtendimentos"] table');
-        let rows = table[0].querySelectorAll("tr"); 
+        let rows = table[0].querySelectorAll("tr"); // Garantindo que estamos acessando a tabela corretamente
         let csvContent = "";
-        
-        let headers = table[0].querySelectorAll("th");
-        let headerRow = ["Unidade"]; 
-        headers.forEach(th => headerRow.push(th.innerText.trim()));
-        csvContent += headerRow.join(";") + "\n"; 
-    
+
+        // Definir os headers EXATAMENTE como no Excel
+        let headerRow = [
+            "Unidade", "Senha", "Nome", "CPF", "Serviço", "Triagem", "Chamada",
+            "Início Atendimento", "Fim Atendimento", "TE (Tempo de Espera)",
+            "TA (Tempo de Atendimento)", "TP (Tempo de Permanência)", "Triador",
+            "Atendente", "Agendado", "Status"
+        ];
+        csvContent += "\uFEFF" + headerRow.join(";") + "\n"; // Adiciona BOM para UTF-8 e os headers
+
+        // Percorrer as linhas da tabela (dados)
         rows.forEach(row => {
             let cols = row.querySelectorAll("td");
-            if (cols.length === 0) return; 
-    
-            let rowData = [unidade]; 
-            cols.forEach(td => {
-                
-                let values = td.innerHTML.split("<br>").map(v => v.trim());
-                rowData.push(...values);
+            if (cols.length === 0) return; // Ignorar linhas sem <td>
+
+            let rowData = [unidade]; // Adiciona a unidade fixa na primeira coluna
+
+            cols.forEach((td, index) => {
+                let textContent = td.innerText.trim(); // Pegando apenas texto puro, sem HTML ou atributos extras
+                let values = textContent.split("\n").map(v => v.replace(/^(Triagem|Chamada|Início Atend|Fim Atend) /, "").trim()); // Separando valores por quebra de linha
+
+                // Se for a coluna do Nome/CPF, garantir que sejam duas colunas
+                if (index === 1) {
+                    rowData.push(values[0] || ""); // Nome
+                    rowData.push(values[1] || ""); // CPF
+                }
+                // Se for a coluna de Hora, garantir 4 valores
+                else if (index === 3) {
+                    rowData.push(values[0] || ""); // Triagem
+                    rowData.push(values[1] || ""); // Chamada
+                    rowData.push(values[2] || ""); // Início Atendimento
+                    rowData.push(values[3] || ""); // Fim Atendimento
+                }
+                // Se for a coluna de Indicadores, garantir 3 valores
+                else if (index === 4) {
+                    rowData.push(values[0]?.replace("TE:", "").trim() || ""); // TE (Tempo de Espera)
+                    rowData.push(values[1]?.replace("TA:", "").trim() || ""); // TA (Tempo de Atendimento)
+                    rowData.push(values[2]?.replace("TP:", "").trim() || ""); // TP (Tempo de Permanência)
+                }
+                // Se for a coluna de Profissionais, garantir 2 valores
+                else if (index === 5) {
+                    rowData.push(values[0]?.replace("Triador:", "").trim() || ""); // Triador
+                    rowData.push(values[1]?.replace("Atendente:", "").trim() || ""); // Atendente
+                }
+                // Outras colunas seguem normalmente
+                else {
+                    rowData.push(values.join(" ")); // Junta valores com espaço se houver mais de um
+                }
             });
-    
-            csvContent += rowData.join(";") + "\n"; 
+
+            csvContent += rowData.join(";") + "\n"; // Junta os valores no CSV
         });
-   
+
+        // Criar e baixar o arquivo CSV
         let blob = new Blob([csvContent], { type: "text/csv;charset=UTF-8" });
         let a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `RELAÇÃO DE ATENDIMENTOS ${unidade}.csv`;
+        a.download = `RELACAO ATENDIMENTOS PRESENCIAIS ${unitNameState}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
     }
-    
+
 }
 
 export async function getBackOfficeTasks(_selectedProfile) {
@@ -250,13 +294,13 @@ export async function getBackOfficeTasks(_selectedProfile) {
                 }
 
             });
-            
+
             const { firstDay, lastDay } = getPreviousMonthRange();
             createdAtInput.value = firstDay;
             createdAtInput.dispatchEvent(new Event("input", { bubbles: true }));
             untilInput.value = lastDay;
             untilInput.dispatchEvent(new Event("input", { bubbles: true }));
-            
+
             await delay(3000)
             const searchTasksButton = await waitFor('#buttonPesquisarFilaUnidade')
             searchTasksButton[0].click()
