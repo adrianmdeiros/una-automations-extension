@@ -1,13 +1,9 @@
-import { getBackOfficeTasks, getFaceToFaceServices } from './actions.js'
+import { getFaceToFaceServices } from './actions.js'
 
 export const automations = [
     {
-        name: '🤖 Baixar planilhas de relação de atendimentos',
+        name: '🤖 Baixar planilhas',
         action: getFaceToFaceServices
-    },
-    {
-        name: '🤖 Baixar planilhas de todas as tarefas',
-        action: getBackOfficeTasks
     }
 ]
 

@@ -15,12 +15,99 @@ export async function getFaceToFaceServices(_selectedProfile) {
         selectUnit[0].click();
 
         await delay(3000)
-        const selectUnits = await waitFor('#select-selectUnidades-popup [role="option"]');
+        const selectUnits = await waitFor('#selectUnidades-popup [role="option"]');
 
         const closeSelectUnitButton = await waitFor('[aria-label="Close"]')
         closeSelectUnitButton[0].click()
 
         for (let i = 1; i < selectUnits.length; i++) {
+            while (i < selectUnits.length && selectUnits[i].textContent.includes('Equipe')) {
+                await delay(3000)
+                const menu = await waitFor('[aria-controls="menu-appbar"]');
+                menu[0].click();
+
+                const menuItems = await waitFor('[role="menu"] li');
+                for (const menuItem of menuItems) {
+                    if (menuItem.textContent.trim() === 'Trocar Perfil') {
+                        menuItem.click();
+                        break;
+                    }
+                }
+
+                const newSelectUnit = await waitFor('#select-selectUnidades button');
+                newSelectUnit[0].click();
+
+                await delay(3000)
+                const units = await waitFor('#selectUnidades-popup [role="option"]');
+
+                units[i].click()
+
+                const selectProfile = await waitFor('#select-selectPerfil button');
+                selectProfile[0].click();
+
+                await delay(3000)
+                const profiles = await waitFor('#selectPerfil-popup [role="option"]');
+
+                if (!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))) {
+                    alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
+                    return
+                }
+
+                for (const profile of profiles) {
+                    if (profile.textContent.trim() === 'GESTOR_UNIDADE') {
+                        profile.click()
+                        break
+                    }
+                }
+
+                const confirmButton = await waitFor('#BtnConfirmarExclusaoOrgao');
+                confirmButton[0].click();
+
+                await delay(3000);
+                window.location.href = 'https://plataforma.dataprev.gov.br/#/capedigital/painel-tarefas';
+                const allTasksTab = await waitFor('[aria-label="Todas as Tarefas"]')
+                allTasksTab[0].click()
+
+                await delay(3000)
+                const filterTasksButton = await waitFor('#buttonFilterTarefas')
+                filterTasksButton[0].click()
+
+                await delay(3000)
+                const filterLabels = await waitFor(".br-input label");
+                let createdAtInput, untilInput
+
+                filterLabels.forEach(label => {
+                    const trimmedText = label.textContent.trim();
+
+                    if (trimmedText.includes("Criada em (Período)")) {
+                        createdAtInput = label.nextElementSibling
+                    }
+
+                    if (trimmedText.includes("até (período)") && !untilInput) {
+                        untilInput = label.nextElementSibling
+                        return
+                    }
+
+                });
+
+                const { firstDay, lastDay } = getYearStartToLastMonthRange();
+                createdAtInput.value = firstDay;
+                createdAtInput.dispatchEvent(new Event("input", { bubbles: true }));
+                untilInput.value = lastDay;
+                untilInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+                await delay(3000)
+                const searchTasksButton = await waitFor('#buttonPesquisarFilaUnidade')
+                searchTasksButton[0].click()
+
+                await delay(3000)
+                const exportButton = await waitFor('#buttonExportarTodasTarefas', 5000);
+                exportButton[0].click();
+                i++
+            }
+
+            if (i >= selectUnits.length) break
+
             await delay(3000)
             const menu = await waitFor('[aria-controls="menu-appbar"]');
             menu[0].click();
@@ -37,13 +124,7 @@ export async function getFaceToFaceServices(_selectedProfile) {
             newSelectUnit[0].click();
 
             await delay(3000)
-            const units = await waitFor('#select-selectUnidades-popup [role="option"]');
-
-            while (i < units.length && units[i].textContent.includes('Equipe')) {
-                i++
-            }
-
-            if (i >= units.length) break
+            const units = await waitFor('#selectUnidades-popup [role="option"]');
 
             const unitTextContent = units[i].textContent
             const unitNameState = unitTextContent.includes('GO/TO')
@@ -56,7 +137,7 @@ export async function getFaceToFaceServices(_selectedProfile) {
             selectProfile[0].click();
 
             await delay(3000)
-            const profiles = await waitFor('#select-selectPerfil-popup [role="option"]');
+            const profiles = await waitFor('#selectPerfil-popup [role="option"]');
 
             if (!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))) {
                 alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
@@ -83,7 +164,7 @@ export async function getFaceToFaceServices(_selectedProfile) {
             selectPeriod[0].click()
 
             await delay(3000)
-            const periods = await waitFor('#select-selectPeriodoRelacao_-popup [role="option"]')
+            const periods = await waitFor('#selectPeriodoRelacao_-popup [role="option"]')
 
             for (const period of periods) {
                 if (period.textContent.trim() === 'Mês passado') {
@@ -95,7 +176,7 @@ export async function getFaceToFaceServices(_selectedProfile) {
             const searchButton = await waitFor('#buttonPesquisarMonitoramentoRelacaoAtendimento')
             searchButton[0].click()
 
-            await delay(5000)
+            await delay(3000)
             await tableToCSV(unitNameState);
 
             // await delay(3000)
@@ -134,7 +215,6 @@ export async function getFaceToFaceServices(_selectedProfile) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    // ToDo - arrumar headers que ele nao está separando
     async function tableToCSV(unidade) {
         let table = await waitFor('[name="tableRelacaoAtendimentos"] table');
         let rows = table[0].querySelectorAll("tr"); // Garantindo que estamos acessando a tabela corretamente
@@ -196,154 +276,16 @@ export async function getFaceToFaceServices(_selectedProfile) {
         let blob = new Blob([csvContent], { type: "text/csv;charset=UTF-8" });
         let a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `RELACAO ATENDIMENTOS PRESENCIAIS ${unitNameState}.csv`;
+        a.download = `RELACAO ATENDIMENTOS PRESENCIAIS ${unidade}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
     }
 
-}
-
-export async function getBackOfficeTasks(_selectedProfile) {
-    try {
-        const menu = await waitFor('[aria-controls="menu-appbar"]');
-        menu[0].click();
-
-        const menuItems = await waitFor('[role="menu"] li');
-        for (const menuItem of menuItems) {
-            if (menuItem.textContent.trim() === 'Trocar Perfil') {
-                menuItem.click();
-                break;
-            }
-        }
-
-        const selectUnit = await waitFor('#select-selectUnidades button');
-        selectUnit[0].click();
-
-        await delay(3000)
-        const units = await waitFor('#select-selectUnidades-popup [role="option"]');
-
-        const closeSelectUnitButton = await waitFor('[aria-label="Close"]')
-        closeSelectUnitButton[0].click()
-
-        for (let i = 0; i < units.length - 1; i++) {
-            await delay(3000)
-            const menu = await waitFor('[aria-controls="menu-appbar"]');
-            menu[0].click();
-
-            const menuItems = await waitFor('[role="menu"] li');
-            for (const menuItem of menuItems) {
-                if (menuItem.textContent.trim() === 'Trocar Perfil') {
-                    menuItem.click();
-                    break;
-                }
-            }
-
-            const newSelectUnit = await waitFor('#select-selectUnidades button');
-            newSelectUnit[0].click();
-
-            await delay(3000)
-            const units = await waitFor('#select-selectUnidades-popup [role="option"]');
-            units[i + 1].click()
-
-            const selectProfile = await waitFor('#select-selectPerfil button');
-            selectProfile[0].click();
-
-            await delay(3000)
-            const profiles = await waitFor('#select-selectPerfil-popup [role="option"]');
-
-            if (!Array.from(profiles).some(el => el.textContent.trim().includes('GESTOR_UNIDADE'))) {
-                alert('❌ Você precisa de um perfil GESTOR_UNIDADE para ter acesso a essas planilhas.')
-                return
-            }
-
-            for (const profile of profiles) {
-                if (profile.textContent.trim() === 'GESTOR_UNIDADE') {
-                    profile.click()
-                    break
-                }
-            }
-
-            const confirmButton = await waitFor('#BtnConfirmarExclusaoOrgao');
-            confirmButton[0].click();
-
-            await delay(3000);
-            window.location.href = 'https://plataforma.dataprev.gov.br/#/capedigital/painel-tarefas';
-
-            const allTasksTab = await waitFor('[aria-label="Todas as Tarefas"]')
-            allTasksTab[0].click()
-
-            await delay(3000)
-            const filterTasksButton = await waitFor('#buttonFilterTarefas')
-            filterTasksButton[0].click()
-
-            await delay(3000)
-            const filterLabels = await waitFor(".br-input label");
-            let createdAtInput, untilInput
-
-            filterLabels.forEach(label => {
-                const trimmedText = label.textContent.trim();
-
-                if (trimmedText.includes("Criada em (Período)")) {
-                    createdAtInput = label.nextElementSibling
-                }
-
-                if (trimmedText.includes("até (período)") && !untilInput) {
-                    untilInput = label.nextElementSibling
-                    return
-                }
-
-            });
-
-            const { firstDay, lastDay } = getPreviousMonthRange();
-            createdAtInput.value = firstDay;
-            createdAtInput.dispatchEvent(new Event("input", { bubbles: true }));
-            untilInput.value = lastDay;
-            untilInput.dispatchEvent(new Event("input", { bubbles: true }));
-
-            await delay(3000)
-            const searchTasksButton = await waitFor('#buttonPesquisarFilaUnidade')
-            searchTasksButton[0].click()
-
-            await delay(5000)
-            const exportButton = await waitFor('#buttonExportarTodasTarefas', 5000);
-            exportButton[0].click();
-        }
-    } catch (error) {
-        console.error('Erro durante a automação:', error);
-        throw error;
-    }
-
-    function waitFor(selector, timeout = 3000) {
-        return new Promise((resolve, reject) => {
-            const element = document.querySelectorAll(selector);
-            if (element.length > 0) {
-                resolve(element);
-                return;
-            }
-            const observer = new MutationObserver((_mutations, obs) => {
-                const element = document.querySelectorAll(selector);
-                if (element.length > 0) {
-                    obs.disconnect();
-                    resolve(element);
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-            setTimeout(() => {
-                observer.disconnect();
-                reject(new Error(`Elemento '${selector}' não encontrado após ${timeout}ms`));
-            }, timeout);
-        });
-    }
-
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    function getPreviousMonthRange() {
+    function getYearStartToLastMonthRange() {
         const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+        const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
+        const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
         const formatDate = (date) => {
             const day = String(date.getDate()).padStart(2, '0');
@@ -353,8 +295,9 @@ export async function getBackOfficeTasks(_selectedProfile) {
         };
 
         return {
-            firstDay: formatDate(firstDay),
-            lastDay: formatDate(lastDay)
+            firstDay: formatDate(firstDayOfYear),
+            lastDay: formatDate(lastDayOfLastMonth)
         };
     }
+
 }
