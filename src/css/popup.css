@@ -83,10 +83,11 @@ button {
   cursor: pointer;
   font-weight: bold;
   font-size: 1.4rem;
+  text-align: start;
 }
 
 button:hover {
-  background-color: white;
+  background: linear-gradient(90deg, #6ba7d6 0%, #a3c96b 33%, #fbcb82 66%);
 }
 
 button:disabled {
