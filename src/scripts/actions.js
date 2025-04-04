@@ -217,62 +217,62 @@ export async function getFaceToFaceServices(_selectedProfile) {
 
     async function tableToCSV(unidade) {
         let table = await waitFor('[name="tableRelacaoAtendimentos"] table');
-        let rows = table[0].querySelectorAll("tr"); // Garantindo que estamos acessando a tabela corretamente
+        let rows = table[0].querySelectorAll("tr"); 
         let csvContent = "";
 
-        // Definir os headers EXATAMENTE como no Excel
+        
         let headerRow = [
             "Unidade", "Senha", "Nome", "CPF", "Serviço", "Triagem", "Chamada",
             "Início Atendimento", "Fim Atendimento", "TE (Tempo de Espera)",
             "TA (Tempo de Atendimento)", "TP (Tempo de Permanência)", "Triador",
             "Atendente", "Agendado", "Status"
         ];
-        csvContent += "\uFEFF" + headerRow.join(";") + "\n"; // Adiciona BOM para UTF-8 e os headers
+        csvContent += "\uFEFF" + headerRow.join(";") + "\n"; 
 
-        // Percorrer as linhas da tabela (dados)
+        
         rows.forEach(row => {
             let cols = row.querySelectorAll("td");
-            if (cols.length === 0) return; // Ignorar linhas sem <td>
+            if (cols.length === 0) return; 
 
-            let rowData = [unidade]; // Adiciona a unidade fixa na primeira coluna
+            let rowData = [unidade]; 
 
             cols.forEach((td, index) => {
-                let textContent = td.innerText.trim(); // Pegando apenas texto puro, sem HTML ou atributos extras
-                let values = textContent.split("\n").map(v => v.replace(/^(Triagem|Chamada|Início Atend|Fim Atend) /, "").trim()); // Separando valores por quebra de linha
+                let textContent = td.innerText.trim(); 
+                let values = textContent.split("\n").map(v => v.replace(/^(Triagem|Chamada|Início Atend|Fim Atend) /, "").trim()); 
 
-                // Se for a coluna do Nome/CPF, garantir que sejam duas colunas
+                
                 if (index === 1) {
-                    rowData.push(values[0] || ""); // Nome
-                    rowData.push(values[1] || ""); // CPF
+                    rowData.push(values[0] || ""); 
+                    rowData.push(values[1] || ""); 
                 }
-                // Se for a coluna de Hora, garantir 4 valores
+                
                 else if (index === 3) {
-                    rowData.push(values[0] || ""); // Triagem
-                    rowData.push(values[1] || ""); // Chamada
-                    rowData.push(values[2] || ""); // Início Atendimento
-                    rowData.push(values[3] || ""); // Fim Atendimento
+                    rowData.push(values[0] || ""); 
+                    rowData.push(values[1] || ""); 
+                    rowData.push(values[2] || ""); 
+                    rowData.push(values[3] || ""); 
                 }
-                // Se for a coluna de Indicadores, garantir 3 valores
+               
                 else if (index === 4) {
-                    rowData.push(values[0]?.replace("TE:", "").trim() || ""); // TE (Tempo de Espera)
-                    rowData.push(values[1]?.replace("TA:", "").trim() || ""); // TA (Tempo de Atendimento)
-                    rowData.push(values[2]?.replace("TP:", "").trim() || ""); // TP (Tempo de Permanência)
+                    rowData.push(values[0]?.replace("TE:", "").trim() || "");
+                    rowData.push(values[1]?.replace("TA:", "").trim() || "");
+                    rowData.push(values[2]?.replace("TP:", "").trim() || ""); 
                 }
-                // Se for a coluna de Profissionais, garantir 2 valores
+                
                 else if (index === 5) {
-                    rowData.push(values[0]?.replace("Triador:", "").trim() || ""); // Triador
-                    rowData.push(values[1]?.replace("Atendente:", "").trim() || ""); // Atendente
+                    rowData.push(values[0]?.replace("Triador:", "").trim() || ""); 
+                    rowData.push(values[1]?.replace("Atendente:", "").trim() || ""); 
                 }
-                // Outras colunas seguem normalmente
+                
                 else {
-                    rowData.push(values.join(" ")); // Junta valores com espaço se houver mais de um
+                    rowData.push(values.join(" "));
                 }
             });
 
-            csvContent += rowData.join(";") + "\n"; // Junta os valores no CSV
+            csvContent += rowData.join(";") + "\n"; 
         });
 
-        // Criar e baixar o arquivo CSV
+        
         let blob = new Blob([csvContent], { type: "text/csv;charset=UTF-8" });
         let a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -282,18 +282,26 @@ export async function getFaceToFaceServices(_selectedProfile) {
         document.body.removeChild(a);
     }
 
-    function getYearStartToLastMonthRange() {
+    function getYearStartToLastMonthRange() { 
         const now = new Date();
-        const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-        const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-
+        let firstDayOfYear;
+        let lastDayOfLastMonth;
+    
+        if (now.getMonth() === 0) { 
+            firstDayOfYear = new Date(now.getFullYear() - 1, 0, 1); 
+            lastDayOfLastMonth = new Date(now.getFullYear() - 1, 11, 31); 
+        } else {
+            firstDayOfYear = new Date(now.getFullYear(), 0, 1); 
+            lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        }
+    
         const formatDate = (date) => {
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             return `${day}${month}${year}`;
         };
-
+    
         return {
             firstDay: formatDate(firstDayOfYear),
             lastDay: formatDate(lastDayOfLastMonth)
