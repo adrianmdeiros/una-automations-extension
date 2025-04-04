@@ -8,12 +8,6 @@ const mergeSheetsSection = document.querySelector('.merge-sheets')
 const automationsSection = document.querySelector('.automations')
 
 automationButtons.forEach((button, key) => button.addEventListener('click', async () => {
-    // const selectedProfile = document.getElementById('profiles-select').value
-    // if(!selectedProfile){
-    //     alert('⚠ Por favor, selecione um perfil.')
-    //     return
-    // }
-
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
 
     const url = new URL(tab.url)
@@ -36,7 +30,6 @@ automationButtons.forEach((button, key) => button.addEventListener('click', asyn
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: automationFunction,
-            // args: [selectedProfile]
         })
         loadingElement.classList.add('hidden')
         mergeSheetsSection.classList.remove('hidden')
