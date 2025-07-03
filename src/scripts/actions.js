@@ -233,11 +233,11 @@ export async function getFaceToFaceServices() {
 
 }
 
-export async function getBackOfficeTasks(){
-    try{
+export async function getBackOfficeTasks() {
+    try {
         const selectUnits = await getAllUnits()
         for (let i = 1; i < selectUnits.length; i++) {
-            if(selectUnits[i].textContent.includes('Equipe')) {
+            if (selectUnits[i].textContent.includes('Equipe')) {
                 await selectUnit(i)
                 await selectProfile()
                 await navigateToAllTasksTab()
@@ -245,7 +245,7 @@ export async function getBackOfficeTasks(){
                 await downloadBackOfficeTasks()
             }
         }
-    }catch(error){
+    } catch (error) {
         console.error('Erro durante a automação:', error);
         throw error;
     }
@@ -330,16 +330,13 @@ export async function getBackOfficeTasks(){
 
     function getYearStartToLastMonthRange() {
         const now = new Date();
-        let firstDayOfYear;
-        let lastDayOfLastMonth;
 
-        if (now.getMonth() === 0) {
-            firstDayOfYear = new Date(now.getFullYear() - 1, 0, 1);
-            lastDayOfLastMonth = new Date(now.getFullYear() - 1, 11, 31);
-        } else {
-            firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-            lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-        }
+        // Último dia do mês anterior
+        const lastDayOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+        // Data 90 dias antes do último dia do mês anterior
+        const firstDay = new Date(lastDayOfLastMonth);
+        firstDay.setDate(firstDay.getDate() - 89); // inclui o último dia na contagem
 
         const formatDate = (date) => {
             const day = String(date.getDate()).padStart(2, '0');
@@ -349,7 +346,7 @@ export async function getBackOfficeTasks(){
         };
 
         return {
-            firstDay: formatDate(firstDayOfYear),
+            firstDay: formatDate(firstDay),
             lastDay: formatDate(lastDayOfLastMonth)
         };
     }
@@ -366,11 +363,11 @@ export async function getBackOfficeTasks(){
         filterLabels.forEach(label => {
             const trimmedText = label.textContent.trim();
 
-            if (trimmedText.includes("Criada em (Período)")) {
+            if (trimmedText.includes("Criada em")) {
                 createdAtInput = label.nextElementSibling
             }
 
-            if (trimmedText.includes("até (período)") && !untilInput) {
+            if (trimmedText.includes("até") && !untilInput) {
                 untilInput = label.nextElementSibling
                 return
             }
